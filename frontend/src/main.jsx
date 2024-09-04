@@ -9,6 +9,7 @@ import Home from './pages/home/Home.jsx'
 import Profile from './pages/profile/Profile.jsx'
 import Orders from './pages/orders/Orders.jsx'
 import FertilizerCalculator from './pages/fertilizerCalculator/FertilizerCalculator.jsx'
+import Searchresults from './pages/searchresults/Searchresults.jsx'
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
   {
     path: '/login-register',
     element: <LoginRegister/>,
+  },
+  {
+    path: '/searchresults/:search',
+    element: <Searchresults/>,
   }
 ]);
 
