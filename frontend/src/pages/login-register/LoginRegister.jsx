@@ -4,8 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 import { faPhone, faLock } from '@fortawesome/free-solid-svg-icons';
+import Notification from '../../components/Notification';
 
 const LoginRegister = () => {
+  //Popup
+  const [isPopup, setisPopup] = useState(false);
+  const [popupMessage, setpopupMessage] = useState("");
+
+  useEffect(() => {
+    if (isPopup) {
+      setTimeout(() => {
+        setisPopup(false);
+      }, 3000);
+    }
+  }, [isPopup]);
+
+  const exitPopup = () => {
+    setisPopup(false);
+  };
+
   //Login-register
   const [login, setlogin] = useState(true);
 
@@ -31,62 +48,120 @@ const LoginRegister = () => {
   };
 
   //Login
-//   const { isAuth, setisAuth, redirect } = useContext(AppContext);
-//   const loginSubmit = async (e) => {
-//     e.preventDefault();
-//     if (phoneinput !== "" && password !== "") {
-//       const data = {
-//         phone: phoneinput,
-//         password: password,
-//       }
-//       try {
-//         const response = await fetch("/users/login", {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify(data),
-//         })
-//           .then(res => res.json())
-//           .then(result => {
-//             if(result.status == 200){
-//               setphoneinput("");
-//               setnameinput("");
-//               setpassword("");
-//               console.log(result);
-  
-//               setisAuth(true);
-  
-//               localStorage.setItem("name", result.data.user.name);
-//               localStorage.setItem("phone", result.data.user.phone);
-//               localStorage.setItem("picture", result.data.user.profilePicture);
-//               localStorage.setItem("wishlist", JSON.stringify(result.data.user.wishlist));
-//             }
-//             else{
-//               throw new Error(result.message);
-//             }
-//           })
-//           .catch(error => console.log(error));
-  
-//       } catch (error) {
-//         console.log(error);
-//       }
-//     }
-//     else{
-//       console.log("Please fill required fields");
-//     }
-//   };
-  
-//   //redirect
-//   const navigate = useNavigate();
-//   useEffect(() => {
-//     if(isAuth == true){
-//       navigate(redirect);
-//     }
-//   }, [isAuth]);
+  const { isAuth, setisAuth, welcome, setwelcome } = useContext(AppContext);
+  const loginSubmit = async (e) => {
+    e.preventDefault();
+    if (phoneinput !== "" && password !== "") {
+      const data = {
+        phone: phoneinput,
+        password: password,
+      }
+      try {
+        const response = await fetch("/api/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then(res => res.json())
+          .then(result => {
+            if (result.status == 200) {
+              setphoneinput("");
+              setnameinput("");
+              setpassword("");
+              console.log(result);
+
+              setisAuth(true);
+
+              localStorage.setItem("name", result.data.user.name);
+              localStorage.setItem("phone", result.data.user.phone);
+              // localStorage.setItem("picture", result.data.user.profilePicture);
+              // localStorage.setItem("wishlist", JSON.stringify(result.data.user.wishlist));
+            }
+            else {
+              throw new Error(result.message);
+            }
+          })
+          .catch(error => console.log(error));
+
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    else {
+      console.log("Please fill required fields");
+      setpopupMessage(`Please fill required fields`);
+      setisPopup(true);
+    }
+  };
+
+  //Register
+  const registerSubmit = async (e) => {
+    e.preventDefault();
+    if (phoneinput !== "" && password !== "" && nameinput !== "") {
+      const data = {
+        name: nameinput,
+        phone: phoneinput,
+        password: password,
+      }
+      try {
+        const response = await fetch("/api/users/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then(res => res.json())
+          .then(result => {
+            if (result.status == 200) {
+              setphoneinput("");
+              setnameinput("");
+              setpassword("");
+              console.log(result);
+              setlogin(false);
+              setpopupMessage(`Registered successfully!!`);
+              setisPopup(true);
+
+              // setisAuth(true);
+
+              // localStorage.setItem("name", result.data.user.name);
+              // localStorage.setItem("phone", result.data.user.phone);
+              // localStorage.setItem("picture", result.data.user.profilePicture);
+              // localStorage.setItem("wishlist", JSON.stringify(result.data.user.wishlist));
+            }
+            else {
+              setpopupMessage(result.message);
+              setisPopup(true);
+              throw new Error(result.message);
+            }
+          })
+          .catch(error => console.log(error));
+
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    else {
+      console.log("Please fill required fields");
+      setpopupMessage(`Please fill required fields`);
+      setisPopup(true);
+    }
+  };
+
+  //redirect
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (isAuth == true) {
+      setwelcome(true);
+      navigate('/home');
+    }
+  }, [isAuth]);
 
   return (
     <div className='h-screen w-screen flex justify-center items-center'>
+      {isPopup && <Notification message={popupMessage} onexit={exitPopup} />}
       <div className='flex md:flex-row flex-col justify-center md:px-20 md:py-10 m-10 max-w-[1000px] rounded-2xl backdrop-blur-sm bg-white/40'>
         <div className='flex flex-col justify-center items-end md:border-b-0 border-b-2  md:border-r-4 p-4 mx-4 md:ml-20 border-gray-700'>
           <div>Welcome to </div>
@@ -109,8 +184,8 @@ const LoginRegister = () => {
             </div>
           </div>
           <div className='text-black mb-3'>{login ? "New user?" : "Existing user?"} <button type='button' onClick={changeModes} className='text-gray-600 hover:underline hover:text-black duration-200'>{login ? "Register here" : "Login here"}</button></div>
-          {login ? <div className='flex justify-center'><button className='py-2 px-4 active:scale-95 duration-200 rounded-md text-white bg-orange-600/50 hover:bg-orange-700/50' type="submit">Login</button></div> :
-            <div className='flex justify-center'><button className='py-2 px-4 active:scale-95 duration-200 rounded-md text-white bg-orange-600/50 hover:bg-orange-700/50' type="submit">Register</button></div>}
+          {login ? <div className='flex justify-center'><button onClick={loginSubmit} className='py-2 px-4 active:scale-95 duration-200 rounded-md text-white bg-orange-600/50 hover:bg-orange-700/50' type="submit">Login</button></div> :
+            <div className='flex justify-center'><button onClick={registerSubmit} className='py-2 px-4 active:scale-95 duration-200 rounded-md text-white bg-orange-600/50 hover:bg-orange-700/50' type="submit">Register</button></div>}
         </form>
       </div>
       <div className='w-screen h-screen fixed z-[-1] brightness-90'>

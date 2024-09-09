@@ -1,0 +1,15 @@
+#filtermenu {
+    animation: launch 200ms ease-out;
+}
+
+@keyframes launch {
+    from {
+        opacity: 0;
+        bottom: 4rem;
+    }
+
+    to {
+        opacity: 1;
+        bottom: 8rem;
+    }
+}

@@ -2,7 +2,7 @@ import React from 'react'
 
 const Orders = () => {
     return (
-        <div className='mt-[4rem] w-screen flex flex-col items-center overflow-hidden text-ellipsis'>
+        <div className='mt-[4rem] sm:mb-0 mb-[4rem] w-screen flex flex-col items-center overflow-hidden text-ellipsis'>
             <div className='px-8 py-2 border-b w-screen'>
                 You have 10 orders.    
             </div>

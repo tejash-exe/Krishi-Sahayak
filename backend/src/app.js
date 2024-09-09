@@ -15,13 +15,11 @@ app.use(express.urlencoded( { extended: true } ));
 app.use(express.static("public"));
 
 import userRouter from "./routes/user.routes.js";
-import sellerRouter from "./routes/seller.routes.js";
-import adminRouter from "./routes/admin.routes.js";
 import productRouter from "./routes/product.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
-app.use("/users", userRouter);
-app.use("/sellers", sellerRouter);
-app.use("/admin", adminRouter);
-app.use("/products", productRouter);
+app.use("/api/users", userRouter);
+app.use("/api/products", productRouter);
+app.use("/api/admin", adminRouter);
 
 export { app };
