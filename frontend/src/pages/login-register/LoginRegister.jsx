@@ -48,7 +48,7 @@ const LoginRegister = () => {
   };
 
   //Login
-  const { isAuth, setisAuth, welcome, setwelcome } = useContext(AppContext);
+  const { isAuth, setisAuth, setwelcome, setname, setphone, setcart, setreward, setaddress } = useContext(AppContext);
   const loginSubmit = async (e) => {
     e.preventDefault();
     if (phoneinput !== "" && password !== "") {
@@ -73,11 +73,16 @@ const LoginRegister = () => {
               console.log(result);
 
               setisAuth(true);
-
-              localStorage.setItem("name", result.data.user.name);
-              localStorage.setItem("phone", result.data.user.phone);
+              
+              setname(result.data.user.name);
+              setphone(result.data.user.phone);
+              setcart(result.data.user.cart);
+              setreward(result.data.user.reward);
+              if(result.data.user.address) setaddress(result.data.user.address);
+              // localStorage.setItem("name", result.data.user.name);
+              // localStorage.setItem("phone", result.data.user.phone);
+              // localStorage.setItem("cart", JSON.stringify(result.data.user.cart));
               // localStorage.setItem("picture", result.data.user.profilePicture);
-              // localStorage.setItem("wishlist", JSON.stringify(result.data.user.wishlist));
             }
             else {
               throw new Error(result.message);

@@ -8,3 +8,23 @@ input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* *::-webkit-scrollbar{
+  background:rgb(255, 255, 255);
+  width: 2px;
+  margin-left: 3px;
+  
+}
+
+*::-webkit-scrollbar-thumb{
+  background:gray;
+  border-radius: 10px;
+} */
+
+/* box-shadow: 5px 0px 0px 0px inset rgb(255, 255, 255); */
+.no-select {
+  user-select: none; /* For modern browsers */
+  -webkit-user-select: none; /* For Safari and Chrome */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For older versions of IE */
+}

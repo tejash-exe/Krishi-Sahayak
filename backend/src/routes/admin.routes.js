@@ -8,7 +8,8 @@ import {
     updateName, 
     updatePhone,
     updatePassword, 
-    addProduct
+    addProduct,
+    addImage,
 } from "../controller/admin.controller.js";
 
 const router = Router();
@@ -22,5 +23,6 @@ router.route("/update-name").post(upload.none(), verifyJWTAdmin, updateName);
 router.route("/update-phone").post(upload.none(), verifyJWTAdmin, updatePhone);
 router.route("/update-password").post(upload.none(), verifyJWTAdmin, updatePassword);
 router.route("/add-product").post(upload.single("coverImage"), verifyJWTAdmin, addProduct);
+router.route("/add-image").post(upload.single("image"), verifyJWTAdmin, addImage);
 
 export default router;

@@ -10,6 +10,9 @@ import Profile from './pages/profile/Profile.jsx'
 import Orders from './pages/orders/Orders.jsx'
 import FertilizerCalculator from './pages/fertilizerCalculator/FertilizerCalculator.jsx'
 import Searchresults from './pages/searchresults/Searchresults.jsx'
+import Cart from './pages/cart/Cart.jsx'
+import ProductPage from './pages/productPage/ProductPage.jsx'
+import ChangeAddress from './pages/changeAddress/ChangeAddress.jsx'
 
 const router = createBrowserRouter([
   {
@@ -31,17 +34,30 @@ const router = createBrowserRouter([
       {
         path: '/fertilizer-calculator',
         element: <FertilizerCalculator/>
-      }
+      },
+      {
+        path: '/cart',
+        element: <Cart/>
+      },
+      {
+        path: '/searchresults/:search',
+        element: <Searchresults/>,
+      },
+      {
+        path: '/product/:productId',
+        element: <ProductPage/>,
+      },
+      {
+        path: '/change-address',
+        element: <ChangeAddress/>,
+      },
     ]
   },
   {
     path: '/login-register',
     element: <LoginRegister/>,
   },
-  {
-    path: '/searchresults/:search',
-    element: <Searchresults/>,
-  }
+  
 ]);
 
 createRoot(document.getElementById('root')).render(

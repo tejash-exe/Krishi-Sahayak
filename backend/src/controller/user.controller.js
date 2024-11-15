@@ -41,7 +41,7 @@ const registerUser = async (req, res) => {
             }
         )
             .catch((error) => { 
-                // console.log(error);
+                console.log(error);
                 throw new Error("Error while saving user information!");
              });
 
@@ -72,8 +72,8 @@ const loginUser = async (req, res) => {
 
         const loggedInUser = await User.findById(user._id).select("-password -refreshToken").lean();
 
-        // const productIds = loggedInUser.wishlist.map(item => item.product._id);
-        // loggedInUser.wishlist = productIds;
+        const productIds = loggedInUser.cart.map(item => item.product._id);
+        loggedInUser.cart = productIds;
 
         res
             .cookie("accessToken", accessToken, options)
@@ -199,6 +199,155 @@ const updatePassword = async (req, res) => {
     };
 };
 
+const addToCart = async (req, res) => {
+    try {
+        const productId = req.body.productId;
+        if (!productId) throw new Error("Product Id not found!");
+
+        const product = await Product.findById(productId)
+            .catch(error => { throw new Error("Cannot find product!") });
+
+        const user = req.user;
+        
+        const index = user.cart.findIndex(item => item.product.equals(productId));
+        // console.log(index);
+
+        if(index == -1) {
+            user.cart.unshift({
+                product: productId,
+                quantity: 1,
+            });
+
+            const savedUser = await user.save()
+            .catch(error => { throw new Error("Cannot able to add product into cart!") });
+        }
+        else{
+            throw new Error("Product already added in cart !");
+        }
+
+        const updatedUser = await User.findById(user._id).select("-password -refreshToken").lean()
+            .catch(error => { throw new Error("Cannot find user!") });
+
+        const productIds = updatedUser.cart.map(item => item.product._id);
+        updatedUser.cart = productIds;
+
+        res.json(new ApiResponse(200, "Product added to cart!", updatedUser));
+
+    } catch (error) {
+        res.json(new ApiResponse(400, error.message));
+    }
+};
+
+const removeFromCart = async (req, res) => {
+    try {
+        const productId = req.body.productId;
+        if (!productId) throw new Error("Product Id not found!");
+
+        const product = await Product.findById(productId)
+            .catch(error => { throw new Error("Cannot find product!") });
+
+        const user = req.user;
+        const objectProductId = new mongoose.Types.ObjectId(productId)
+
+        user.cart = user.cart.filter((id) => !(id.product).equals(objectProductId));
+
+        const savedUser = await user.save()
+            .catch(error => { throw new Error("Cannot remove product from cart!") });
+
+        const updatedUser = await User.findById(savedUser._id).select("-password -refreshToken").lean()
+            .catch(error => { throw new Error("Cannot find user!") });
+
+        const productIds = updatedUser.cart.map(item => item.product._id);
+        updatedUser.cart = productIds;
+
+        res.json(new ApiResponse(200, "Product removed from cart!", updatedUser));
+    } catch (error) {
+        res.json(new ApiResponse(400, error.message));
+    }
+};
+
+const findCart = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select("-password -refreshToken").populate({
+            path: 'cart.product'
+        }).lean();
+
+        res.json(new ApiResponse(200, "Cart fetched successfully!", user.cart));
+    } catch (error) {
+        res.status(400).json(new ApiResponse(400, error.message));
+    }
+};
+
+const increaseQuantity = async (req, res) => {
+    try {
+        const productId = req.body.productId;
+        if (!productId) throw new Error("Product Id not found!");
+
+        const product = await Product.findById(productId)
+            .catch(error => { throw new Error("Cannot find product!") });
+
+        const user = req.user;
+        
+        const index = user.cart.findIndex(item => item.product.equals(productId));
+        // console.log(index);
+
+        if(index == -1) throw new Error("Product is not in the cart!");
+
+        if(user.cart[index].quantity >= Math.min(10, product.quantity)){
+            throw new Error("Max quantity!");
+        }
+        else{
+            user.cart[index].quantity++;
+        }
+
+        const savedUser = await user.save()
+            .catch(error => { throw new Error("Cannot able to save info!") });
+
+        const updatedUser = await User.findById(req.user._id).select("-password -refreshToken").populate({
+            path: 'cart.product'
+        }).lean();
+
+        res.json(new ApiResponse(200, "Quantity increased successfully!", updatedUser.cart));
+    } catch (error) {
+        res.status(400).json(new ApiResponse(400, error.message));
+    }
+};
+
+const decreaseQuantity = async (req, res) => {
+    try {
+        const productId = req.body.productId;
+        if (!productId) throw new Error("Product Id not found!");
+
+        const product = await Product.findById(productId)
+            .catch(error => { throw new Error("Cannot find product!") });
+
+        const user = req.user;
+        
+        const index = user.cart.findIndex(item => item.product.equals(productId));
+        // console.log(index);
+
+        if(index == -1) throw new Error("Product is not in the cart!");
+
+        if(user.cart[index].quantity <= 1){
+            throw new Error("Min quantity!");
+        }
+        else{
+            user.cart[index].quantity--;
+        }
+
+        const savedUser = await user.save()
+            .catch(error => { throw new Error("Cannot able to save info!") });
+
+        const updatedUser = await User.findById(req.user._id).select("-password -refreshToken").populate({
+            path: 'cart.product'
+        }).lean();
+
+        res.json(new ApiResponse(200, "Quantity decreased successfully!", updatedUser.cart));
+    } catch (error) {
+        res.status(400).json(new ApiResponse(400, error.message));
+    }
+};
+
 const addToWishlist = async (req, res) => {
     try {
         const productId = req.body.productId;
@@ -234,6 +383,7 @@ const addToWishlist = async (req, res) => {
         res.json(new ApiResponse(400, error.message));
     }
 };
+
 
 const removeFromWishlist = async (req, res) => {
     try {
@@ -293,32 +443,33 @@ const findWishlist = async (req, res) => {
     }
 };
 
-const addAddress = async (req, res) => {
+const changeAddress = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
-        if (!user) throw new Error("User does not exist!");
-
-        if(user.address.length >= 3) throw new Error("Error! Already 3 addresses are there!");
-
         const { localAddress, landmark, city, state, pincode } = req.body;
 
-        if ([localAddress, city, state, pincode].some((field => field?.trim() === ""))) {
+        if ([localAddress, city, state].some((field => field?.trim() === ""))) {
             throw new Error("Error! Required fields are missing");
         };
 
-        user.address.push({
-            localAddress: localAddress.trim(),
-            landmark: landmark.trim(),
-            city: city.trim(),
-            state: state.trim(),
-            pincode: pincode.trim(),
-        });
+        const user = req.user;
+
+        user.address = {
+            localAddress: localAddress?.trim(),
+            landmark: landmark?.trim(),
+            city: city?.trim(),
+            state: state?.trim(),
+            pincode: pincode,
+        };
 
         const savedUser = await user.save()
             .catch(error => { throw new Error("Cannot save address!") });
 
+        const updatedUser = await User.findById(savedUser._id).select("-password -refreshToken").lean()
+        .catch(error => { throw new Error("Cannot find user!") });
 
+        res.json(new ApiResponse(200, "Address changed successfully!", updatedUser));
     } catch (error) {
+        // console.log(error);
         res.status(400).json(new ApiResponse(400, error.message));
     }
 }
@@ -330,7 +481,13 @@ export {
     updateName,
     updatePhone,
     updatePassword,
+    addToCart,
+    removeFromCart,
+    findCart,
+    increaseQuantity,
+    decreaseQuantity,
     addToWishlist,
     removeFromWishlist,
-    findWishlist
+    findWishlist,
+    changeAddress
 }; 

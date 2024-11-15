@@ -232,7 +232,38 @@ const addProduct = async (req, res) => {
         console.log(error);
         res.json(new ApiResponse(400, error.message));
     }
-}
+};
+
+const addImage = async (req, res) => {
+    try {
+        const { productId } = req.body;
+
+        if(productId?.trim() == "") throw new Error("Error! ProductId required");
+
+        const product = await Product.findById(productId);
+        if(!product) throw new Error("Cannot find product!");
+
+        const imagePath = req.file.path;
+
+        const savedImage = await uploadOnCloudinary(imagePath);
+        if(!savedImage) throw new Error("Unable to save image!");
+
+        if(product.images.length >= 5) throw new Error("Error! You can only add upto 5 images");
+
+        product.images = [...product.images, savedImage];
+
+        const savedProduct = await product.save()
+        .catch(error => { throw new Error("Cannot able to save product!") });
+
+        const updatedProduct = await Product.findById(savedProduct._id);
+        if(!updatedProduct) throw new Error("Cannot able to find product after saving!");
+
+        res.json(new ApiResponse(200, "Image added successfully!", updatedProduct));
+
+    } catch (error) {
+        res.json(new ApiResponse(400, error.message));
+    }
+};
 
 export {
     registerAdmin,
@@ -242,4 +273,5 @@ export {
     updatePhone,
     updatePassword,
     addProduct,
+    addImage,
 }; 

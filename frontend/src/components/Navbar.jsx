@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useContext, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, NavLink } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-regular-svg-icons'
 import { faMagnifyingGlass, faXmark, faGlobe, faShoppingCart } from '@fortawesome/free-solid-svg-icons'
@@ -7,7 +7,7 @@ import { AppContext } from '../context/context'
 
 
 const Navbar = () => {
-  
+
   const navigate = useNavigate();
   const { isAuth, setisAuth } = useContext(AppContext);
 
@@ -58,11 +58,10 @@ const Navbar = () => {
     navigate(`/searchresults/${fertilizer}/`);
   };
 
-  // Language
-  const { language, setlanguage } = useContext(AppContext);
-
-  const changeLanguage = (event) => {
-    setlanguage(event.target.value);
+  //Cart
+  const gotocart = (e) => {
+    e.preventDefault();
+    navigate('/cart');
   };
 
   //Profilemenu
@@ -99,7 +98,8 @@ const Navbar = () => {
     };
   }, [profile]);
 
-  //Select menu (language)
+  // Language
+  const { language, setlanguage } = useContext(AppContext);
   const languagebuttonref = useRef();
   const languagemenuref = useRef();
   const [openlanguagemenu, setopenlanguagemenu] = useState(false);
@@ -131,7 +131,7 @@ const Navbar = () => {
       document.removeEventListener('click', handleLanguageClick);
     };
   }, [openlanguagemenu]);
-  
+
 
   return (
     <div className='fixed top-0 w-screen z-10 bg-white h-[4rem] flex justify-between items-center shadow'>
@@ -148,35 +148,37 @@ const Navbar = () => {
         </form>
       </div>
       <div className='flex items-center'>
-        <button ref={languagebuttonref} onClick={languagebuttonclick} className='mr-5 cursor-pointer flex items-center border-2 border-green-700 rounded-3xl md:p-2 p-3 hover:bg-gray-100 duration-200'>
+        <div ref={languagebuttonref} onClick={languagebuttonclick} className={'mr-5 cursor-pointer flex items-center border-2 rounded-3xl md:p-2 p-3 duration-200 ' + ((openlanguagemenu) ? ' bg-orange-200 border-orange-300 ' : ' hover:bg-orange-50 border-gray-200 hover:border-orange-300')}>
           <FontAwesomeIcon icon={faGlobe} className=' text-gray-800 h-5 w-5 ' />
           <div className='outline-none mx-2 bg-inherit md:block hidden '>
             {language}
           </div>
-            {openlanguagemenu && 
-              <div ref={languagemenuref} className='flex flex-col fixed top-[4rem] md:right-i right-4 items-start bg-gray-200 p-4 rounded-xl'>
-                <div className='pb-2 border-b-2 border-gray-300'>Select language</div>
-                <button onClick={(e) => setlanguage('English')} className='pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200'>English</button>
-                <button onClick={(e) => setlanguage('Hindi')} className='pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200'>Hindi</button>
-              </div>
-            }
-          {/* <select ref={languagemenuref} className='outline-none ml-2 w-[5rem] bg-inherit sm:block hidden ' id="options" value={language} onChange={changeLanguage}>
-            <option value="" disabled>Select language</option>
-            <option value="English">English</option>
-            <option value="Hindi">Hindi</option>
-          </select> */}
-        </button>
-        <button className='h-12 w-12 rounded-full mr-8 bg-gray-200 active:bg-gray-300 duration-150'><FontAwesomeIcon className='p-3 h-5 w-5' icon={faShoppingCart}/></button>
+          {openlanguagemenu &&
+            <div ref={languagemenuref} className='flex flex-col fixed top-[5rem] sm:right-[8rem] right-4 items-start bg-gray-100 p-4 rounded-xl'>
+              <div className='pb-2 border-b-2 border-gray-300'>Select language</div>
+              <div onClick={(e) => setlanguage('English')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "English") ? ' font-semibold' : ' ')}>English</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>हिन्दी</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>ਪੰਜਾਬੀ</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>हरियाणवी</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>বাংলা</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>తెలుగు</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>தமிழ்</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>ಕನ್ನಡ</div>
+              <div onClick={(e) => setlanguage('Hindi')} className={'pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200 ' + ((language == "Hindi") ? ' font-semibold' : ' ')}>മലയാളം</div>
+            </div>
+          }
+        </div>
+        <NavLink className={({ isActive }) => 'cursor-pointer h-12 w-12 flex justify-center items-center rounded-full mr-4  duration-150 ' + ((isActive) ? ' bg-green-700 text-white ' : ' hover:bg-gray-300/80 bg-gray-200 active:bg-gray-300 ')} to='/cart'><FontAwesomeIcon className='p-3 h-5 w-5' icon={faShoppingCart} /></NavLink>
         <button ref={profilebuttonref} onClick={profilebuttonclick} className='h-12 w-12 rounded-full mr-8 sm:block hidden bg-gray-400 hover:bg-gray-400/80 active:bg-gray-400 duration-150'>
           <FontAwesomeIcon className='p-3 h-4 w-4' icon={faUser} />
           {profile &&
-            <div ref={profilemenuref} onClick={(e) => e.stopPropagation()} className='mt-6 fixed p-4 rounded-xl bg-gray-200 right-4 flex flex-col items-start w-[150px] duration-200'>
+            <div ref={profilemenuref} onClick={(e) => e.stopPropagation()} className='mt-6 fixed p-4 rounded-xl bg-gray-100 right-4 flex flex-col items-start w-[150px] duration-200'>
 
               <div className='border-b-2 text-left border-gray-300 pb-2 text-gray-600 cursor-default'>Hello, {name}</div>
               <Link to="/profile" className='pt-2 text-gray-600 hover:text-black hover:font-semibold duration-200'>Profile</Link>
               <Link to="/orders" className='py-2 text-gray-600 hover:text-black hover:font-semibold duration-200'>Orders</Link>
-              {isAuth ? <button onClick={(e) => handleLogout(e)} className='text-white hover:bg-red-500 px-4 py-3 bg-red-400 rounded-md duration-200' >Log Out</button> :
-              <button onClick={(e) => handleLogin(e)} className='text-white hover:bg-red-500 px-4 py-3 bg-red-400 rounded-md duration-200' >Log In</button>}
+              {isAuth ? <div onClick={(e) => handleLogout(e)} className='text-white hover:bg-red-500 px-4 py-3 bg-red-400 rounded-md duration-200' >Log Out</div> :
+                <div onClick={(e) => handleLogin(e)} className='text-white hover:bg-red-500 px-4 py-3 bg-red-400 rounded-md duration-200' >Log In</div>}
             </div>
           }
         </button>

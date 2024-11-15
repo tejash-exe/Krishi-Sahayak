@@ -36,6 +36,11 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Error! Must include Phone no.'],
         unique: [true, 'Error! Phone no. must be unique']
     },
+    reward: {
+        type: Number,
+        min: [0, "Error! Reward cannot be negative!"],
+        default: 0,
+    },
     password: {
         type: String,
         required: [true, 'Error! Must include password'],
@@ -53,13 +58,12 @@ const userSchema = new mongoose.Schema({
             quantity: {
                 type: Number,
                 default: 1,
-            },
-            time: {
-                type: Date,
-            },
+            }
         }
     ],
-    address: {addressSchema},
+    address: {
+        type: addressSchema,
+    },
 }, { timestamps: true });
 
 userSchema.pre("save", async function (next) {

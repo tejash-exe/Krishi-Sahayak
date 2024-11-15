@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBoxOpen, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faBoxOpen, faLock, faPhone, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../context/context';
 
@@ -32,8 +32,7 @@ const Profile = () => {
   }, [isAuth]);
 
   //Info
-  const name = localStorage.getItem("name") || "Please login";
-  const phone = localStorage.getItem("phone");
+  const { name, setname, phone, setphone, reward, address } = useContext(AppContext);
 
   //Update menu
   const [updateOption, setupdateOption] = useState("Name");
@@ -72,8 +71,8 @@ const Profile = () => {
               setnameinput("");
               setpasswordinput("");
               console.log(result);
-  
-              localStorage.setItem("name", result.data.name);
+              setname(result.data.name);
+              // localStorage.setItem("name", result.data.name);
               // localStorage.setItem("phone", result.data.user.phone);
               // localStorage.setItem("picture", result.data.user.profilePicture);
               // localStorage.setItem("wishlist", JSON.stringify(result.data.user.wishlist));
@@ -114,8 +113,8 @@ const Profile = () => {
               setphoneinput("");
               setpasswordinput("");
               console.log(result);
-  
-              localStorage.setItem("phone", result.data.phone);
+              setphone(result.data.phone);
+              // localStorage.setItem("phone", result.data.phone);
               // localStorage.setItem("phone", result.data.user.phone);
               // localStorage.setItem("picture", result.data.user.profilePicture);
               // localStorage.setItem("wishlist", JSON.stringify(result.data.user.wishlist));
@@ -214,7 +213,7 @@ const Profile = () => {
             <div className='mb-10'>
               <div>Name : {name}</div>
               <div>Phone : {phone}</div>
-              <div>Reward : ₹0/- </div>
+              <div>Reward : ₹{reward}</div>
             </div>
           </div>
           {/* <div className='justify-around min-w-[9rem] flex flex-col items-center bg-gradient-to-br from-red-400 via-pink-400 to-pink-200 md:mr-6 mr-3 md:mb-6 mb-3 rounded-2xl'>
@@ -251,12 +250,14 @@ const Profile = () => {
           {(updateOption == 'Name') &&
             <form onSubmit={(e) => handleupdateName(e)} className='m-6 mt-0 p-6 bg-gray-200 rounded-xl'>
               <div>Enter new name : </div>
-              <div className='mt-2 mb-4'>
-                <input required className='bg-gray-50 outline-none rounded-xl px-3 py-2' type="text" name='Name' placeholder='Name' value={nameinput} onChange={changeName}/>
+              <div className='mt-2 mb-4 bg-gray-50 outline-none rounded-xl flex items-center w-fit'>
+                <FontAwesomeIcon className='p-3' icon={faUser}/>
+                <input required className='bg-gray-50 outline-none rounded-xl pr-3 py-2' type="text" name='Name' placeholder='Name' value={nameinput} onChange={changeName}/>
               </div>
               <div>Enter password : </div>
-              <div className='mt-2 mb-6'>
-                <input required className='bg-gray-50 outline-none rounded-xl px-3 py-2' type="password" name='Old password' placeholder='Password' value={passwordinput} onChange={changePassword} />
+              <div className='mt-2 mb-6 bg-gray-50 outline-none rounded-xl flex items-center w-fit'>
+                <FontAwesomeIcon className='p-3' icon={faLock}/>
+                <input required className='bg-gray-50 outline-none rounded-xl pr-3 py-2' type="password" name='Old password' placeholder='Password' value={passwordinput} onChange={changePassword} />
               </div>
               <input className='bg-green-700 text-white px-3 py-2 rounded-xl cursor-pointer active:scale-95 hover:bg-green-50 hover:text-black duration-200 border-2 border-green-700' type="submit" value="Update name" />
             </form>
@@ -264,12 +265,14 @@ const Profile = () => {
           {(updateOption == 'Phone') &&
             <form onSubmit={(e) => handleupdatePhone(e)} className='m-6 mt-0 p-6 bg-gray-200 rounded-xl'>
               <div>Enter new phone number : </div>
-              <div className='mt-2 mb-4'>
-                <input required className='bg-gray-50 outline-none rounded-xl px-3 py-2' type="number" name='Phone' placeholder='Phone number' value={phoneinput} onChange={changePhone} />
+              <div className='mt-2 mb-4 bg-gray-50 outline-none rounded-xl flex items-center w-fit'>
+                <FontAwesomeIcon className='p-3' icon={faPhone}/>
+                <input required className='bg-gray-50 outline-none rounded-xl pr-3 py-2' type="number" name='Phone' placeholder='Phone number' value={phoneinput} onChange={changePhone} />
               </div>
               <div>Enter password : </div>
-              <div className='mt-2 mb-6'>
-                <input required className='bg-gray-50 outline-none rounded-xl px-3 py-2' type="password" name='Old password' placeholder='Password' value={passwordinput} onChange={changePassword} />
+              <div className='mt-2 mb-6 bg-gray-50 outline-none rounded-xl flex items-center w-fit'>
+                <FontAwesomeIcon className='p-3' icon={faLock}/>
+                <input required className='bg-gray-50 outline-none rounded-xl pr-3 py-2' type="password" name='Old password' placeholder='Password' value={passwordinput} onChange={changePassword} />
               </div>
               <input className='bg-green-700 text-white px-3 py-2 rounded-xl cursor-pointer active:scale-95 hover:bg-green-50 hover:text-black duration-200 border-2 border-green-700' type="submit" value="Update phone no." />
             </form>
@@ -277,20 +280,44 @@ const Profile = () => {
           {(updateOption == "Password") &&
             <form onSubmit={(e) => handleupdatePassword(e)} className='m-6 mt-0 p-6 bg-gray-200 rounded-xl'>
               <div>Enter new password : </div>
-              <div className='mt-2 mb-4'>
-                <input required className='bg-gray-50 outline-none rounded-xl px-3 py-2' type="password" name='new password' placeholder='New password' value={newpasswordinput} onChange={changeNewpassword} />
+              <div className='mt-2 mb-4 bg-gray-50 outline-none rounded-xl flex items-center w-fit'>
+                <FontAwesomeIcon className='p-3' icon={faLock}/>
+                <input required className='bg-gray-50 outline-none rounded-xl pr-3 py-2' type="password" name='new password' placeholder='New password' value={newpasswordinput} onChange={changeNewpassword} />
               </div>
               <div>Confirm new password : </div>
-              <div className='mt-2 mb-4'>
-                <input required className={((newpasswordinput === confirmpasswordinput) ? ' bg-gray-50 ' : ' bg-red-200 ') + ' outline-none rounded-xl px-3 py-2 '} type="password" name='confirm new password' placeholder='Confirm new password' value={confirmpasswordinput} onChange={changeConfirmpassword} />
+              <div className='mt-2 mb-4 bg-gray-50 outline-none rounded-xl flex items-center w-fit'>
+                <FontAwesomeIcon className='p-3' icon={faLock}/>
+                <input required className={((newpasswordinput === confirmpasswordinput) ? ' bg-gray-50 ' : ' bg-red-200 ') + ' outline-none rounded-xl pr-3 py-2 '} type="password" name='confirm new password' placeholder='Confirm new password' value={confirmpasswordinput} onChange={changeConfirmpassword} />
               </div>
               <div>Enter current password : </div>
-              <div className='mt-2 mb-6'>
-                <input required className='bg-gray-50 outline-none rounded-xl px-3 py-2' type="password" name='Old password' placeholder='Current Password' value={passwordinput} onChange={changePassword} />
+              <div className='mt-2 mb-6 bg-gray-50 outline-none rounded-xl flex items-center w-fit'>
+                <FontAwesomeIcon className='p-3' icon={faLock}/>
+                <input required className='bg-gray-50 outline-none rounded-xl pr-3 py-2' type="password" name='Old password' placeholder='Current Password' value={passwordinput} onChange={changePassword} />
               </div>
               <input className='bg-green-700 text-white px-3 py-2 rounded-xl cursor-pointer active:scale-95 hover:bg-green-50 hover:text-black duration-200 border-2 border-green-700' type="submit" value="Update password" />
             </form>
           }
+        </div>
+        <div className='text-3xl font-semibold my-6'>My Address :</div>
+        <div className='border-2 border-green-700 rounded-2xl mb-6 flex md:p-6 p-4 justify-between items-center'>
+          <div>
+            <div>
+              <span>Address: {name}</span>
+              <span>, {phone}</span>
+            </div>
+            <div>
+              <span>{address.localAddress}</span>
+              <span> {address.landmark}</span>
+            </div>
+            <div>
+              <span> PINCODE - {address.pincode}</span>
+              <span>, {address.city}</span>
+              <span>, {address.state}</span>
+            </div>
+          </div>
+          <div>
+            <button className='hover:bg-red-50 duration-200 rounded-xl px-4 py-3 border-2 border-red-600 text-red-600 font-bold'>CHANGE ADDRESS</button>
+          </div>
         </div>
         <div className='text-3xl font-semibold my-6'>My Orders :</div>
         <div className='border-2 border-green-700 rounded-2xl mb-6 flex md:p-6 p-4 overflow-x-auto'>

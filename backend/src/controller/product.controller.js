@@ -69,7 +69,7 @@ const findProducts = async (req, res) => {
     }
 };
 
-const productDetails = async (req, res) => {
+const fetchProduct = async (req, res) => {
     try {
         const productid = req.params?.productid;
         if(!productid) throw new Error("Product id not found!");
@@ -77,10 +77,13 @@ const productDetails = async (req, res) => {
         const product = await Product.findById(productid.trim())
         .catch(error => { throw new Error("Invalid ID!")});
 
-        res.json(new ApiResponse(200,"Product found succesfully!", product))
+        res.json(new ApiResponse(200,"Product found succesfully!", product));
     } catch (error) {
-        res.json(new ApiResponse(400, "Cannot fetch product!" , {error}))
+        res.json(new ApiResponse(400, error.message ));
     }
 }
 
-export { findProducts, productDetails };
+export { 
+    findProducts, 
+    fetchProduct,
+};
